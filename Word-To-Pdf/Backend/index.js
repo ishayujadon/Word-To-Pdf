@@ -46,17 +46,15 @@ app.post("/convertFile", upload.single("file"), (req, res, next) => {
             "files",
             `${req.file.originalname}.pdf`
         );
-        docxToPDF(req.file.path, outoutPath, (err, result) => {
+        convertDocxToPdf(req.file.path, outoutPath, (err) => {
             if (err) {
-                console.log(err);
-                return res.status(500).json({
-                    message: "Error converting docx to pdf",
-                });
+                return res.status(500).json({ message: "Error converting docx to pdf" });
             }
             res.download(outoutPath, () => {
-                console.log("file downloaded");
+                console.log("File downloaded");
             });
         });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
