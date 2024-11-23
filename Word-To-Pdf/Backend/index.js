@@ -3,6 +3,7 @@ const multer = require("multer");
 const cors = require("cors");
 const docxToPDF = require("docx-pdf");
 const path = require("path");
+const { exec } = require("child_process");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,6 +19,18 @@ const storage = multer.diskStorage({
         cb(null, file.originalname);
     },
 });
+
+const convertDocxToPdf = (inputPath, outputPath, callback) => {
+    const command = `libreoffice --headless --convert-to pdf --outdir "${path.dirname(outputPath)}" "${inputPath}"`;
+    exec(command, (err, stdout, stderr) => {
+        if (err) {
+            console.error("Conversion Error:", stderr);
+            return callback(err);
+        }
+        console.log("Conversion Success:", stdout);
+        callback(null);
+    });
+};
 
 const upload = multer({ storage: storage });
 app.post("/convertFile", upload.single("file"), (req, res, next) => {
